@@ -1,0 +1,186 @@
+// importing the audio player library
+import ddf.minim.*;
+import ddf.minim.signals.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
+
+// contains the main page image
+PImage mainImage = new PImage();
+// checks whether you are on main page or not
+Boolean isMainPage;
+
+int numberOfSongs = 3;
+// declares minim to load the songs
+Minim[] minims = new Minim[ numberOfSongs ];
+// declares songs to store the songs
+AudioPlayer[] songs = new AudioPlayer[ numberOfSongs ];
+
+// stores name of the files (songs)
+String[] nameOfFiles = new String[ numberOfSongs ];
+
+// stores artist images with play button
+PImage[] playImages = new PImage[ numberOfSongs ];
+// stores artist images with pause button
+PImage[] pauseImages = new PImage[ numberOfSongs ];
+
+// stores the music objects
+Music[] musics = new Music[ numberOfSongs ];
+// sotres the artist objects
+Artist[] artists = new Artist[ numberOfSongs ];
+
+// stores play/pause button positions (x1, y1, x2, y2) to allow users to determine play/pause button is clicked
+int[] playAndPauseButtonPosition = new int[4];
+// stores back button positions (x1, y1, x2, y2) to allow users to determine back button is clicked
+int[] backButtonPosition = new int[4];
+// stores clicked music's index
+int counter;
+// stores the index of currently playing song
+int playingMusicIndex;
+// boolean variable that determines whether song is playing or not
+Boolean isPlaying = false;
+// boolean variable that determines whether you are on pause page or play page
+Boolean isOnPausePage;
+
+// initializes the main page / song names / minims / music objects / artist objects / button positions
+void setup()
+{
+    size( 426, 640 );
+    mainImage = loadImage( "main.PNG" );
+    image( mainImage, 0, 0 );
+    isMainPage = true;
+    
+    initializeSongs();
+    
+    for( int index1 = 0; index1 < numberOfSongs; index1++ )
+    {
+        minims[index1] = new Minim(this);
+    }
+    
+    for( int index2 = 0; index2 < numberOfSongs; index2++ )
+    {
+        musics[index2] = new Music( 0, 150 + (60 * index2), 426, 210 + (60 * index2), nameOfFiles[index2], minims[index2] );
+    }
+    
+    initializeArtists();
+    initializeButtonPositions();
+    initializePlayImages();
+}
+
+void draw()
+{
+  
+}
+
+// initializes name of the files (songs)
+void initializeSongs()
+{
+    nameOfFiles[0] = "Christina Aguilera - What a girl wants.mp3";
+    nameOfFiles[1] = "Bruno Mars - It Will Rain.mp3";
+    nameOfFiles[2] = "Carly Rae Jepsen - Call Me Maybe.mp3";
+}
+
+// initializes artist objects with three different artists (holds artist's name, title, and cover image)
+void initializeArtists()
+{
+    artists[0] = new Artist( "Christina Aguilera", "What A Girl Wants", "whatagirl1.PNG" );
+    artists[1] = new Artist( "Bruno Mars", "It Will Rain", "itwillrain1.PNG" );
+    artists[2] = new Artist( "Carly Rae Jepsen", "Call Me Maybe", "callmemaybe1.PNG" );
+}
+
+// index 0 - x1, index 1 - y1, index 2 - x2, index 3 - y2
+void initializeButtonPositions()
+{
+    playAndPauseButtonPosition[0] = 192;
+    playAndPauseButtonPosition[1] = 525;
+    playAndPauseButtonPosition[2] = 241;
+    playAndPauseButtonPosition[3] = 566;
+    
+    backButtonPosition[0] = 7;
+    backButtonPosition[1] = 40;
+    backButtonPosition[2] = 63;
+    backButtonPosition[3] = 78;
+}
+
+// initializes and loads images with play button
+void initializePlayImages()
+{
+    playImages[0] = loadImage( "whatagirl2.PNG" );
+    playImages[1] = loadImage( "itwillrain2.PNG" );
+    playImages[2] = loadImage( "callmemaybe2.PNG" );
+}
+
+void playSong( int index )
+{
+    pauseImages[index] = artists[index].getCoverImage();
+    image( pauseImages[index], 0, 0 );
+    songs[index] = musics[index].getSong();
+    songs[index].play();
+}
+
+// when mouse is pressed with left button, it will do the following
+// 1. if user is on main page and clicks on the song, user will be directed to selected artist's image and plays the song
+// 2. if user is on the artist's image page, user is allowed to click on back button or play/pause button
+// 2a. if user clicks on a back button, user will be directed to main page so user can select another music
+//      if user selects a new music, it will stop the currently playing music and plays the new music
+// 2b. if user clicks on a pause button, it will pause the currently playing music
+//     if user clicks on a play button, it will play the currently playing music (NOT WORKING AT THIS POINT)
+void mousePressed()
+{
+    if( mouseButton == LEFT ) 
+    {
+        if( isMainPage == true )
+        {
+            for( int ind = 0; ind < numberOfSongs; ind++ )
+            {
+                if( ( mouseX >= musics[ind].getX1Position() && mouseX <= musics[ind].getX2Position() )
+                   && ( mouseY >= musics[ind].getY1Position() && mouseY <= musics[ind].getY2Position() ) )
+                {
+                    if( isPlaying == false )
+                    {
+                        playingMusicIndex = ind;
+                        playSong( playingMusicIndex );
+                        isMainPage = false;
+                        isPlaying = true;
+                    }
+                    else
+                    {
+                        songs[playingMusicIndex].rewind();
+                        delay(200);
+                        songs[playingMusicIndex].pause();
+                        playingMusicIndex = ind;
+                        playSong( playingMusicIndex );
+                        isMainPage = false;
+                        isPlaying = false;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // play/pause button
+            if( ( mouseX >= playAndPauseButtonPosition[0] && mouseX <= playAndPauseButtonPosition[2] )
+             && ( mouseY >= playAndPauseButtonPosition[1] && mouseY <= playAndPauseButtonPosition[3] ) )
+            {
+                if( isPlaying == true )
+                {
+                    songs[playingMusicIndex].pause();
+                    image( playImages[playingMusicIndex], 0, 0 );
+                    isPlaying = false;
+                }
+                else
+                {
+                    playSong( playingMusicIndex );
+                    isPlaying = true;
+                }
+            }
+            else if( ( mouseX >= backButtonPosition[0] && mouseX <= backButtonPosition[2] )
+                 && ( mouseY >= backButtonPosition[1] && mouseY <= backButtonPosition[3] ) )
+            {
+                mainImage = loadImage( "main.PNG" );
+                image( mainImage, 0, 0 );
+                isMainPage = true;
+                isPlaying = true;
+            }
+        }
+    }
+}

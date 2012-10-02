@@ -1,0 +1,30 @@
+// Music class to create Music objects
+class Music
+{
+    // holds x1 position
+    int xPos1;
+    // holds y1 position
+    int yPos1;
+    // holds x2 position
+    int xPos2;
+    // holds y2 position
+    int yPos2;
+    // holds the song
+    AudioPlayer song;
+    
+    // constructor that takes in x1, y1, x2, y2 positions, name of the file, and minim to initialize Music object
+    public Music( int x1, int y1, int x2, int y2, String nameOfFile, Minim m )
+    {
+        xPos1 = x1;
+        yPos1 = y1;
+        xPos2 = x2;
+        yPos2 = y2;
+        song = m.loadFile( nameOfFile );
+    }
+    
+    public int getX1Position() { return xPos1; }
+    public int getY1Position() { return yPos1; }
+    public int getX2Position() { return xPos2; }
+    public int getY2Position() { return yPos2; }
+    public AudioPlayer getSong() { return song; }    
+}
