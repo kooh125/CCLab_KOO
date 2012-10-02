@@ -1,0 +1,22 @@
+// Artist class to create Artist objects
+class Artist
+{
+    // holds the name of the artist
+    String nameOfArtist;
+    // holds the title of the artist
+    String titleOfSong;
+    // holds the cover image of the artist
+    PImage coverImage;
+  
+    // constructor that takes in name, title, and cover to initialize Aritst object
+    public Artist( String name, String title, String cover )
+    {
+        nameOfArtist = name;
+        titleOfSong = title;
+        coverImage = loadImage( cover );
+    }
+
+    public String getNameArtist() { return nameOfArtist; }
+    public String getTitle() { return titleOfSong; }
+    public PImage getCoverImage() { return coverImage; }
+}
